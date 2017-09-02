@@ -5,12 +5,12 @@ package com.raydevelopers.sony.match.model;
  */
 
 public class Interest {
-    public String mUserName;
-    public String mEmail;
-    public Interest(){}
-    public Interest(String username,String email)
+    public boolean mConnected=false;
+    public Interest()
     {
-        this.mEmail=email;
-        this.mUserName=username;
+
+    }
+    public Interest(boolean connected){
+        this.mConnected=connected;
     }
 }

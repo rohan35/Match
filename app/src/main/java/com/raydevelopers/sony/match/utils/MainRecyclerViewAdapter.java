@@ -1,7 +1,9 @@
 package com.raydevelopers.sony.match.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.Image;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +12,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.raydevelopers.sony.match.MainActivity;
 import com.raydevelopers.sony.match.R;
 import com.raydevelopers.sony.match.model.Interest;
 import com.raydevelopers.sony.match.model.User;
@@ -29,6 +34,8 @@ import java.util.ArrayList;
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MyViewHolder> {
 private Context mContext;
     private ArrayList<User> mUser;
+    private   FirebaseUser user;
+    private String key;
 
     public  MainRecyclerViewAdapter(Context c, ArrayList<User> user)
     {
@@ -49,11 +56,13 @@ private Context mContext;
         holder.age.setText(String.valueOf(mUser.get(position).mAge));
         Picasso.with(mContext).load(mUser.get(position).mProfilePic).into(holder.imageView);
 
-
         holder.sendInterest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-UpdateFirebaseSendUsers(mUser.get(position).mUserName,"rohansharma2839@yahoo.com");
+                SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(mContext);
+                String key=sharedPreferences.getString("key",null);
+                String bindIds=key+"_"+mUser.get(position).mkey;
+                UpdateFirebaseSendUsers(bindIds);
                 holder.sendInterest.setText("Interest Send");
                 holder.sendInterest.setEnabled(false);
 
@@ -84,27 +93,18 @@ UpdateFirebaseSendUsers(mUser.get(position).mUserName,"rohansharma2839@yahoo.com
 
         }
     }
-    public void UpdateFirebaseSendUsers(final String email, final String currentUser)
+    public void UpdateFirebaseSendUsers(final String bindIds)
     {
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        final String userId = ref.child("interest").push().getKey();
-        ref.child("interest").orderByChild("mUserName").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.child("interest").child(bindIds).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()) {
-                    for (DataSnapshot postDataSnapshot : dataSnapshot.getChildren()) {
-                        Interest user = postDataSnapshot.getValue(Interest.class);
-                        if (user.mEmail.equals(email)) {
-                            System.out.println("ji");
-                        } else {
-                            Interest user1 = new Interest(currentUser, email);
-                            ref.child("interest").child(userId).setValue(user1);
-                        }
-                    }
+                  //Already sent
                 }
                 else {
-                    Interest user1 = new Interest(currentUser, email);
-                    ref.child("interest").child(userId).setValue(user1);
+                    Interest user1 = new Interest();
+                    ref.child("interest").child(bindIds).setValue(user1);
 
                 }
 

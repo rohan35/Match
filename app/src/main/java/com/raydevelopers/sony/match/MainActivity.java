@@ -1,8 +1,12 @@
 package com.raydevelopers.sony.match;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -30,7 +34,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-private ArrayList<User> mUsersList=new ArrayList<>();
+private  ArrayList<User> mUsersList=new ArrayList<>();
     private RecyclerView mRecyclerView;
     private MainRecyclerViewAdapter mAdapter;
     @Override
@@ -67,6 +71,7 @@ private ArrayList<User> mUsersList=new ArrayList<>();
             email.setText(user.getEmail());
             getUsers();
 
+
         } else {
             // No user is signed in
 
@@ -81,15 +86,33 @@ private ArrayList<User> mUsersList=new ArrayList<>();
                 for(DataSnapshot postSnapshot:dataSnapshot.getChildren())
                 {
                     User users=postSnapshot.getValue(User.class);
-                    mUsersList.add(users);
+                    System.out.println(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                    if(users.mUserName.equals(sharedPreferences.getString("id",null)))
+                    {
+
+                        SharedPreferences.Editor editor=sharedPreferences.edit();
+                        editor.putString("key",postSnapshot.getKey());
+                        editor.apply();
+                    }
+
+                    mUsersList.add(new User(users.mName,users.mUserName,users.mAge
+                    ,users.mSex,users.mProfilePic,postSnapshot.getKey()));
+
+                    mAdapter=new MainRecyclerViewAdapter(getApplicationContext(),mUsersList);
+                    mRecyclerView.setAdapter(mAdapter);
+                    GridLayoutManager gridLayoutManager=new GridLayoutManager(MainActivity.this,2);
+                    mRecyclerView.setLayoutManager(gridLayoutManager);
+
+                    System.out.println(mUsersList.toString());
+
+                    mAdapter.notifyDataSetChanged();
+
+
                 }
-                System.out.println(mUsersList.toString());
-                mAdapter=new MainRecyclerViewAdapter(getApplicationContext(),mUsersList);
-                LinearLayoutManager linearLayoutManager=new LinearLayoutManager(MainActivity.this
-                        ,LinearLayoutManager.VERTICAL,false);
-                mRecyclerView.setLayoutManager(linearLayoutManager);
-                mRecyclerView.setAdapter(mAdapter);
-                mAdapter.notifyDataSetChanged();
+
+
+
             }
 
             @Override
@@ -139,9 +162,14 @@ private ArrayList<User> mUsersList=new ArrayList<>();
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
+            Intent i=new Intent(MainActivity.this,InterestReceived.class);
+            startActivity(i);
         } else if (id == R.id.nav_gallery) {
-
+            Intent i=new Intent(MainActivity.this,AcceptedInterest.class);
+            startActivity(i);
         } else if (id == R.id.nav_slideshow) {
+            Intent i=new Intent(MainActivity.this,MessangerActivity.class);
+            startActivity(i);
 
         } else if (id == R.id.nav_manage) {
 

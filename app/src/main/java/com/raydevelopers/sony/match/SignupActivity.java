@@ -124,7 +124,11 @@ public void checkUserExistence(final FirebaseUser user, final AccessToken token)
 {
     final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
     final String userId = ref.child("users").push().getKey();
-    ref.child("users").orderByChild("mUserName").equalTo(user.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
+    SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(
+            SignupActivity.this);
+    String id=sharedPreferences.getString("id",null);
+
+    ref.child("users").orderByChild("mUserName").equalTo(id).addListenerForSingleValueEvent(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             if(dataSnapshot.exists())
@@ -150,8 +154,13 @@ public void checkUserExistence(final FirebaseUser user, final AccessToken token)
                                     JSONObject data=picture.getJSONObject("data");
                                     System.out.println(data.getString("url"));
                                     int age=ageObject.getInt("min");
-                                    User user1=new User(object.getString("name"),object.getString("email"),
+                                    User user1=new User(object.getString("name"),object.getString("id"),
                                             age,object.getString("gender"),data.getString("url"));
+                                    SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(
+                                            SignupActivity.this);
+                                    SharedPreferences.Editor editor=sharedPreferences.edit();
+                                    editor.putString("id",object.getString("id"));
+                                    editor.apply();
                                     ref.child("users").child(userId).setValue(user1);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
