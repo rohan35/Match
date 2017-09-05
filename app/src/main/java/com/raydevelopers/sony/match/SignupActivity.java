@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.raydevelopers.sony.match.model.User;
+import com.raydevelopers.sony.match.utils.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -158,10 +159,13 @@ public void checkUserExistence(final FirebaseUser user, final AccessToken token)
                                             age,object.getString("gender"),data.getString("url"));
                                     SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(
                                             SignupActivity.this);
+
                                     SharedPreferences.Editor editor=sharedPreferences.edit();
                                     editor.putString("id",object.getString("id"));
                                     editor.apply();
+                                    user1.mFirebaseToken=sharedPreferences.getString(Constants.ARG_FIREBASE_TOKEN,null);
                                     ref.child("users").child(userId).setValue(user1);
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -169,7 +173,7 @@ public void checkUserExistence(final FirebaseUser user, final AccessToken token)
                             }
                         });
                 Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,link,email,gender,age_range,picture");
+                parameters.putString("fields", "id,name,link,email,gender,age_range,picture.type(large)");
                 request.setParameters(parameters);
                 request.executeAsync();
 

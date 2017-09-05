@@ -61,7 +61,7 @@ private Context mContext;
             public void onClick(View v) {
                 SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(mContext);
                 String key=sharedPreferences.getString("key",null);
-                String bindIds=key+"_"+mUser.get(position).mkey;
+                String bindIds=key+"match"+mUser.get(position).mkey;
                 UpdateFirebaseSendUsers(bindIds);
                 holder.sendInterest.setText("Interest Send");
                 holder.sendInterest.setEnabled(false);

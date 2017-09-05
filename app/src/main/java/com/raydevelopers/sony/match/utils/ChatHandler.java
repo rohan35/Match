@@ -21,7 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.raydevelopers.sony.match.R;
+import com.raydevelopers.sony.match.fcm.FcmNotificationBuilder;
 import com.raydevelopers.sony.match.model.Chat;
+import com.raydevelopers.sony.match.model.User;
 
 import java.util.ArrayList;
 
@@ -35,7 +37,10 @@ public class ChatHandler extends AppCompatActivity {
     private  String receiver_sender_key="";
     private RecyclerView mRecyclerView;
     private String senderKey,receiverKey;
+    public static boolean active = false;
     private EditText message;
+    private String senderFirebaseToken;
+    private String receiverFirebaseToken;
     private String timeStamp;
     private  ArrayList<Chat> meChatList=new ArrayList<>();
     private static ArrayList<Chat> otherChatList=new ArrayList<>();
@@ -51,8 +56,11 @@ public class ChatHandler extends AppCompatActivity {
         SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(this);
         senderKey=sharedPreferences.getString("key",null);
         receiverKey=i.getStringExtra("receiver_key");
-        sender_receiver_key=senderKey+"_"+receiverKey;
-        receiver_sender_key=receiverKey+"_"+senderKey;
+        sender_receiver_key=senderKey+"match"+receiverKey;
+        receiver_sender_key=receiverKey+"match"+senderKey;
+        senderFirebaseToken=sharedPreferences.getString(Constants.ARG_FIREBASE_TOKEN,null);
+        getToken(receiverKey);
+
 
         getUserchats();
         mAdapter=new ChatRecyclerViewAdapter(ChatHandler.this,meChatList);
@@ -76,17 +84,49 @@ public class ChatHandler extends AppCompatActivity {
     public void updateUserChatMessages()
     {
         final DatabaseReference ref=FirebaseDatabase.getInstance().getReference();
-        final String userId = ref.child("chat").child(sender_receiver_key).push().getKey();
-        ref.child("chat").child(sender_receiver_key).addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.child("chat").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Long tsLong = System.currentTimeMillis()/1000;
-                String ts = tsLong.toString();
-                Chat chat=new Chat(senderKey,receiverKey,message.getText().toString(),ts);
+                if(dataSnapshot.hasChild(sender_receiver_key)) {
+                    Long tsLong = System.currentTimeMillis() / 1000;
+                    String ts = tsLong.toString();
+                    Chat chat = new Chat(senderKey, receiverKey, message.getText().toString(), ts);
 
-                ref.child("chat").child(sender_receiver_key).child(userId).setValue(chat);
-                message.getText().clear();
+                    ref.child("chat").child(sender_receiver_key).child(ts).setValue(chat);
+                    message.getText().clear();
 
+
+
+                        sendPushNotificationToReceiver(chat.mSender,
+                                chat.mMessage,
+                                senderFirebaseToken,
+                               receiverFirebaseToken);
+                    }
+                else if(dataSnapshot.hasChild(receiver_sender_key))
+                {
+                    Long tsLong = System.currentTimeMillis() / 1000;
+                    String ts = tsLong.toString();
+                    Chat chat = new Chat(senderKey,receiverKey, message.getText().toString(), ts);
+
+                    ref.child("chat").child(receiver_sender_key).child(ts).setValue(chat);
+                    message.getText().clear();
+                        sendPushNotificationToReceiver(chat.mSender,
+                                chat.mMessage,
+                                senderFirebaseToken,
+                                receiverFirebaseToken);
+                      }
+                else {
+                    Long tsLong = System.currentTimeMillis() / 1000;
+                    String ts = tsLong.toString();
+                    Chat chat = new Chat(senderKey, receiverKey, message.getText().toString(), ts);
+
+                    ref.child("chat").child(sender_receiver_key).child(ts).setValue(chat);
+                    message.getText().clear();
+                        sendPushNotificationToReceiver(chat.mSender,
+                            chat.mMessage,
+                            senderFirebaseToken,
+                                receiverFirebaseToken);
+                }
             }
 
             @Override
@@ -94,6 +134,38 @@ public class ChatHandler extends AppCompatActivity {
 
             }
         });
+    }
+    private void  getToken(final String key)
+    {
+        DatabaseReference ref=FirebaseDatabase.getInstance().getReference();
+        ref.child("users").child(key).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    User user = dataSnapshot.getValue(User.class);
+                    receiverFirebaseToken = user.mFirebaseToken;
+                }
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+    private void sendPushNotificationToReceiver(String username,
+                                                String message,
+                                                String firebaseToken,
+                                                String receiverFirebaseToken) {
+        FcmNotificationBuilder.initialize()
+                .title(username)
+                .message(message)
+                .username(username)
+                .firebaseToken(firebaseToken)
+                .receiverFirebaseToken(receiverFirebaseToken)
+                .send();
     }
     public void getUserchats()
     {
@@ -181,5 +253,16 @@ public class ChatHandler extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        active = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        active = false;
     }
 }

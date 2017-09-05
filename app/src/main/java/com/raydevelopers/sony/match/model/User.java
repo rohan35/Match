@@ -12,7 +12,7 @@ public class User {
     public String mProfilePic;
     public String mkey;
     public User mUser;
-
+    public String mFirebaseToken;
     public User() {
         //Default construcutor;
     }

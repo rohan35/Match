@@ -1,0 +1,11 @@
+package com.raydevelopers.sony.match.utils;
+
+/**
+ * Created by SONY on 03-09-2017.
+ */
+
+public class Constants {
+    public static final String ARG_USERS = "users";
+    public static final String ARG_FIREBASE_TOKEN = "firebaseToken";
+    public static final String ARG_RECEIVER = "receiver";
+}

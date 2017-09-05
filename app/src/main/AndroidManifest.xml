@@ -14,6 +14,18 @@
         <activity android:name=".InterestReceived"/>
         <activity android:name=".AcceptedInterest"/>
         <activity android:name=".MessangerActivity"/>
+        <service
+            android:name=".fcm.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".fcm.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
         <activity
             android:name=".SignupActivity"
             android:label="@string/app_name"
@@ -24,7 +36,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".utils.ChatHandler"/>
+        <activity android:name=".utils.ChatHandler"
+            android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">

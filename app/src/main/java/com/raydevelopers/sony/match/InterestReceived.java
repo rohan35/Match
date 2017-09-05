@@ -44,7 +44,7 @@ public class InterestReceived extends AppCompatActivity {
                 for(DataSnapshot postDataSnapShot:dataSnapshot.getChildren())
                 {
 
-                String users[] = postDataSnapShot.getKey().split("_");
+                String users[] = postDataSnapShot.getKey().split("match");
                     System.out.println(users[1]);
                 if (users[1].equals(key)&&users.length>0) ;
                 {

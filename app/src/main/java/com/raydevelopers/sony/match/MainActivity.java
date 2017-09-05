@@ -160,22 +160,16 @@ private  ArrayList<User> mUsersList=new ArrayList<>();
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.interest_received) {
             // Handle the camera action
             Intent i=new Intent(MainActivity.this,InterestReceived.class);
             startActivity(i);
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.friends) {
             Intent i=new Intent(MainActivity.this,AcceptedInterest.class);
             startActivity(i);
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.messanger) {
             Intent i=new Intent(MainActivity.this,MessangerActivity.class);
             startActivity(i);
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
 

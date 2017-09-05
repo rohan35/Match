@@ -59,7 +59,7 @@ public class ReceivedRecylerViewAdapter extends RecyclerView.Adapter<ReceivedRec
            @Override
             public void onClick(View v) {
                 Interest interest=new Interest(true);
-                ref.child(mUserDetails.get(position).mkey+"_"+senderKey).setValue(interest);
+                ref.child(mUserDetails.get(position).mkey+"match"+senderKey).setValue(interest);
                holder.accept.setVisibility(View.GONE);
                holder.decline.setVisibility(View.GONE);
                holder.chat.setVisibility(View.VISIBLE);

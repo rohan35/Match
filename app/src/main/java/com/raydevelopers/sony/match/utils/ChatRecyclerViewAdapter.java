@@ -90,6 +90,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter{
             return VIEW_TYPE_ME;
         }
         else {
+            System.out.println(mineChats.get(position).mReceiver);
             return VIEW_TYPE_OTHER;
         }
     }

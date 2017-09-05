@@ -53,7 +53,7 @@ public class AcceptedInterest extends AppCompatActivity {
 
                     String[] temp;
 
-                   temp= listOfusers.get(i).split("_");
+                   temp= listOfusers.get(i).split("match");
                     if(temp[0].equals(key))
                     {
                         users.add(temp[1]);
