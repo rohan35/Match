@@ -1,6 +1,7 @@
 package com.raydevelopers.sony.match.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,9 +28,19 @@ public class MessangerRecyclerViewAdapter extends RecyclerView.Adapter<Messanger
         this.users=users1;
     }
     @Override
-    public MessangerRecyclerViewAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MessangerRecyclerViewAdapter.MyViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         View v= LayoutInflater.from(mContext).inflate(R.layout.messanger_rv_layout,parent,false);
-        MyViewHolder myViewHolder=new MyViewHolder(v);
+        final MyViewHolder myViewHolder=new MyViewHolder(v);
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(mContext,ChatHandler.class);
+
+                i.putExtra(Constants.ARG_RECEIVER_KEY,users.get(myViewHolder.getAdapterPosition()).mkey);
+                mContext.startActivity(i);
+            }
+        });
+       ;
         return  myViewHolder;
     }
 
@@ -37,6 +48,7 @@ public class MessangerRecyclerViewAdapter extends RecyclerView.Adapter<Messanger
     public void onBindViewHolder(MessangerRecyclerViewAdapter.MyViewHolder holder, int position) {
         Picasso.with(mContext).load(users.get(position).mProfilePic).into(holder.profilePic);
         holder.name.setText(users.get(position).mName);
+
     }
 
     @Override

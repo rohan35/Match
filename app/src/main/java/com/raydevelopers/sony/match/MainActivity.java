@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.facebook.share.internal.ShareInternalUtility;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +29,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.raydevelopers.sony.match.model.User;
+import com.raydevelopers.sony.match.utils.Constants;
 import com.raydevelopers.sony.match.utils.MainRecyclerViewAdapter;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 
@@ -36,12 +39,14 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 private  ArrayList<User> mUsersList=new ArrayList<>();
     private RecyclerView mRecyclerView;
+    private AVLoadingIndicatorView loadingIndicatorView;
     private MainRecyclerViewAdapter mAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        loadingIndicatorView=(AVLoadingIndicatorView)findViewById(R.id.indicator);
         setSupportActionBar(toolbar);
         mRecyclerView=(RecyclerView)findViewById(R.id.people_rv);
 
@@ -53,6 +58,7 @@ private  ArrayList<User> mUsersList=new ArrayList<>();
                         .setAction("Action", null).show();
             }
         });
+        startAnim();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -77,10 +83,18 @@ private  ArrayList<User> mUsersList=new ArrayList<>();
 
         }
     }
+
+    void startAnim(){
+        loadingIndicatorView.show();
+
+    }
+    void stopAnim(){
+        loadingIndicatorView.hide();
+         }
     private void getUsers()
     {
         DatabaseReference reference= FirebaseDatabase.getInstance().getReference("users");
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot postSnapshot:dataSnapshot.getChildren())
@@ -88,11 +102,11 @@ private  ArrayList<User> mUsersList=new ArrayList<>();
                     User users=postSnapshot.getValue(User.class);
                     System.out.println(FirebaseAuth.getInstance().getCurrentUser().getUid());
                     SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-                    if(users.mUserName.equals(sharedPreferences.getString("id",null)))
+                    if(users.mUserName.equals(sharedPreferences.getString(Constants.ID,null)))
                     {
 
                         SharedPreferences.Editor editor=sharedPreferences.edit();
-                        editor.putString("key",postSnapshot.getKey());
+                        editor.putString(Constants.ARG_KEY,postSnapshot.getKey());
                         editor.apply();
                     }
 
@@ -107,6 +121,7 @@ private  ArrayList<User> mUsersList=new ArrayList<>();
                     System.out.println(mUsersList.toString());
 
                     mAdapter.notifyDataSetChanged();
+                    stopAnim();
 
 
                 }
@@ -169,8 +184,16 @@ private  ArrayList<User> mUsersList=new ArrayList<>();
             startActivity(i);
         } else if (id == R.id.messanger) {
             Intent i=new Intent(MainActivity.this,MessangerActivity.class);
+            startActivity(i);}
+            else if(id==R.id.logout){
+            SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor=sharedPreferences.edit();
+            editor.remove(Constants.ID).clear();
+           // editor.remove(Constants.ARG_FIREBASE_TOKEN).clear();
+            editor.apply();
+            FirebaseAuth.getInstance().signOut();
+            Intent i=new Intent(MainActivity.this,SignupActivity.class);
             startActivity(i);
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

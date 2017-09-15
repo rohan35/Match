@@ -103,8 +103,7 @@ public class SignupActivity  extends AppCompatActivity{
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            checkUserExistence(user,token);
+                            getUser(token);
 
 
                             //updateUI(user);
@@ -121,66 +120,71 @@ public class SignupActivity  extends AppCompatActivity{
                 });
     }
 
-public void checkUserExistence(final FirebaseUser user, final AccessToken token)
+public void getUser(final AccessToken token)
+{
+    GraphRequest request = GraphRequest.newMeRequest(
+            token,
+            new GraphRequest.GraphJSONObjectCallback() {
+                @Override
+                public void onCompleted(
+                        JSONObject object,
+                        GraphResponse response) {
+                    // Application code
+                    try {
+                        System.out.println(object.toString());
+                        JSONObject ageObject=new JSONObject(object.getString("age_range"));
+                        JSONObject picture=new JSONObject(object.getString("picture"));
+                        JSONObject data=picture.getJSONObject("data");
+                        System.out.println(data.getString("url"));
+                        int age=ageObject.getInt("min");
+                        User user1 =new User(object.getString("name"),object.getString("id"),
+                                age,object.getString("gender"),data.getString("url"));
+                        SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(
+                                SignupActivity.this);
+
+                        SharedPreferences.Editor editor=sharedPreferences.edit();
+                        editor.putString(Constants.ID,object.getString("id"));
+                        editor.commit();
+                        user1.mFirebaseToken=sharedPreferences.getString(Constants.ARG_FIREBASE_TOKEN,null);
+                        checkUserExistence(user1);
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+    Bundle parameters = new Bundle();
+    parameters.putString("fields", "id,name,link,email,gender,age_range,picture.type(large)");
+    request.setParameters(parameters);
+    request.executeAsync();
+}
+public void checkUserExistence(final User user)
 {
     final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
     final String userId = ref.child("users").push().getKey();
     SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(
             SignupActivity.this);
-    String id=sharedPreferences.getString("id",null);
+    String id=sharedPreferences.getString(Constants.ID,null);
 
     ref.child("users").orderByChild("mUserName").equalTo(id).addListenerForSingleValueEvent(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             if(dataSnapshot.exists())
             {
-               //Username exist
+                //Username exist
             }
             else {
                 //User doesnt exist
                 //Create New
-
-                GraphRequest request = GraphRequest.newMeRequest(
-                        token,
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(
-                                    JSONObject object,
-                                    GraphResponse response) {
-                                // Application code
-                                try {
-                                   System.out.println(object.toString());
-                                    JSONObject ageObject=new JSONObject(object.getString("age_range"));
-                                    JSONObject picture=new JSONObject(object.getString("picture"));
-                                    JSONObject data=picture.getJSONObject("data");
-                                    System.out.println(data.getString("url"));
-                                    int age=ageObject.getInt("min");
-                                    User user1=new User(object.getString("name"),object.getString("id"),
-                                            age,object.getString("gender"),data.getString("url"));
-                                    SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(
-                                            SignupActivity.this);
-
-                                    SharedPreferences.Editor editor=sharedPreferences.edit();
-                                    editor.putString("id",object.getString("id"));
-                                    editor.apply();
-                                    user1.mFirebaseToken=sharedPreferences.getString(Constants.ARG_FIREBASE_TOKEN,null);
-                                    ref.child("users").child(userId).setValue(user1);
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,link,email,gender,age_range,picture.type(large)");
-                request.setParameters(parameters);
-                request.executeAsync();
+                ref.child("users").child(userId).setValue(user);
 
 
             }
             Intent i=new Intent(SignupActivity.this,MainActivity.class);
             startActivity(i);
+            finish();
 
         }
 

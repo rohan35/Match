@@ -36,7 +36,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter{
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         RecyclerView.ViewHolder viewHolder = null;
         SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(mContext);
-        userKey=sharedPreferences.getString("key",null);
+        userKey=sharedPreferences.getString(Constants.ARG_KEY,null);
 
         switch (viewType) {
             case VIEW_TYPE_ME:
@@ -83,7 +83,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter{
     @Override
     public int getItemViewType(int position) {
         SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(mContext);
-        userKey=sharedPreferences.getString("key",null);
+        userKey=sharedPreferences.getString(Constants.ARG_KEY,null);
 
         if(userKey.equals(mineChats.get(position).mSender))
         {

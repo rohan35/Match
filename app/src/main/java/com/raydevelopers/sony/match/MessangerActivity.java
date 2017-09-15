@@ -3,6 +3,7 @@ package com.raydevelopers.sony.match;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.raydevelopers.sony.match.model.Chat;
 import com.raydevelopers.sony.match.model.User;
+import com.raydevelopers.sony.match.utils.Constants;
 import com.raydevelopers.sony.match.utils.MessangerRecyclerViewAdapter;
 
 import java.util.ArrayList;
@@ -33,17 +35,24 @@ public class MessangerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.messanger_layout);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-    final String key = sharedPreferences.getString("key", null);
+        mRecyclerView=(RecyclerView)findViewById(R.id.message_rv);
+    final String key = sharedPreferences.getString(Constants.ARG_KEY, null);
        final DatabaseReference ref=FirebaseDatabase.getInstance().getReference("chat");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getKey().contains(key))
+                for(DataSnapshot dataSnapshot1:dataSnapshot.getChildren())
                 {
-                    ref.child(dataSnapshot.getKey()).orderByChild("mTimeStamp").addChildEventListener(new ChildEventListener() {
+                if(dataSnapshot1.getKey().contains(key))
+                {
+                    ref.child(dataSnapshot1.getKey()).orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {
+
                         @Override
-                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        Chat chat=dataSnapshot.getValue(Chat.class);
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for(DataSnapshot dataSnapshot2:dataSnapshot.getChildren())
+                            {
+                                System.out.println(dataSnapshot2.getValue());
+                                Chat chat=dataSnapshot2.getValue(Chat.class);
                             if(chat.mSender.equals(key)) {
                                 usersList.add(chat.mReceiver);
                             }
@@ -51,30 +60,16 @@ public class MessangerActivity extends AppCompatActivity {
                             {
                                 usersList.add(chat.mSender);
                             }
-                       getUsers();
-                        }
+                            getUsers();
+                                break;
 
-                        @Override
-                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                        }
-
-                        @Override
-                        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                        }
-
-                        @Override
-                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                        }
+                        }}
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
                         }
                     });
-                }
+                }}
             }
 
             @Override

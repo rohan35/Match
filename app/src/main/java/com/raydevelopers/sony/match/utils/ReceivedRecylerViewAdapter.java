@@ -54,7 +54,7 @@ public class ReceivedRecylerViewAdapter extends RecyclerView.Adapter<ReceivedRec
         holder.user_name.setText(mUserDetails.get(position).mName);
         final DatabaseReference ref= FirebaseDatabase.getInstance().getReference("interest");
         SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(mContext);
-        final String senderKey=sharedPreferences.getString("key",null);
+        final String senderKey=sharedPreferences.getString(Constants.ARG_KEY,null);
         holder.accept.setOnClickListener(new View.OnClickListener() {
            @Override
             public void onClick(View v) {
@@ -78,7 +78,7 @@ public class ReceivedRecylerViewAdapter extends RecyclerView.Adapter<ReceivedRec
             @Override
             public void onClick(View v) {
                 Intent i=new Intent(mContext,ChatHandler.class);
-                i.putExtra("receiver_key",mUserDetails.get(position).mkey);
+                i.putExtra(Constants.ARG_RECEIVER_KEY,mUserDetails.get(position).mkey);
                 mContext.startActivity(i);
             }
         });

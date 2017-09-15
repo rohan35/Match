@@ -7,5 +7,8 @@
     <string name="action_settings">Settings</string>
     <string name="facebook_app_id">208993692968457</string>
     <string name="fb_login_protocol_scheme">fb208993692968457</string>
+    <string name="no_matches">No match found. Please tell your friends to install this  application and try again</string>
+    <string name="empty_view">Nothing to show!</string>
+    <string name="no_messages">No Messages. Start messages with whom you got matched</string>
 
 </resources>

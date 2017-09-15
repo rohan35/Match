@@ -11,7 +11,12 @@
         <item
             android:id="@+id/messanger"
             android:title="Messages" />
-        </group>
 
+        </group>
+<group android:checkableBehavior="single">
+    <item
+        android:id="@+id/logout"
+        android:title="Logout" />
+    </group>
 
 </menu>

@@ -1,5 +1,6 @@
 package com.raydevelopers.sony.match.utils;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.Image;
@@ -8,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -52,7 +54,7 @@ private Context mContext;
 
     @Override
     public void onBindViewHolder(final MainRecyclerViewAdapter.MyViewHolder holder, final int position) {
-        holder.name.setText(mUser.get(position).mName);
+        holder.name.setText(mUser.get(position).mName+", ");
         holder.age.setText(String.valueOf(mUser.get(position).mAge));
         Picasso.with(mContext).load(mUser.get(position).mProfilePic).into(holder.imageView);
 
@@ -60,8 +62,13 @@ private Context mContext;
             @Override
             public void onClick(View v) {
                 SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(mContext);
-                String key=sharedPreferences.getString("key",null);
+                String key=sharedPreferences.getString(Constants.ARG_KEY,null);
                 String bindIds=key+"match"+mUser.get(position).mkey;
+                ObjectAnimator animY = ObjectAnimator.ofFloat(holder.sendInterest, "translationY", -100f, 0f);
+                animY.setDuration(1000);//1sec
+                animY.setInterpolator(new BounceInterpolator());
+                animY.setRepeatCount(0);
+                animY.start();
                 UpdateFirebaseSendUsers(bindIds);
                 holder.sendInterest.setText("Interest Send");
                 holder.sendInterest.setEnabled(false);

@@ -44,7 +44,7 @@ private Context mContext;
             @Override
             public void onClick(View v) {
                 Intent i=new Intent(mContext,ChatHandler.class);
-                i.putExtra("receiver_key",mUsers.get(position).mkey);
+                i.putExtra(Constants.ARG_RECEIVER_KEY,mUsers.get(position).mkey);
                 mContext.startActivity(i);
             }
         });

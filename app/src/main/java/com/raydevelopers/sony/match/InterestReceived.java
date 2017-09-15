@@ -17,6 +17,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.raydevelopers.sony.match.model.Interest;
 import com.raydevelopers.sony.match.model.User;
+import com.raydevelopers.sony.match.utils.Constants;
 import com.raydevelopers.sony.match.utils.ReceivedRecylerViewAdapter;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class InterestReceived extends AppCompatActivity {
         setContentView(R.layout.received_layout);
         mRecyclerView=(RecyclerView)findViewById(R.id.received_rv);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(InterestReceived.this);
-        final String key = sharedPreferences.getString("key", null);
+        final String key = sharedPreferences.getString(Constants.ARG_KEY, null);
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("interest");
         ref.orderByChild("mConnected").equalTo(false).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

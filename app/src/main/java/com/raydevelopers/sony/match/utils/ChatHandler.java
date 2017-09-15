@@ -54,8 +54,8 @@ public class ChatHandler extends AppCompatActivity {
         Intent i=getIntent();
         //getIntent
         SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(this);
-        senderKey=sharedPreferences.getString("key",null);
-        receiverKey=i.getStringExtra("receiver_key");
+        senderKey=sharedPreferences.getString(Constants.ARG_KEY,null);
+        receiverKey=i.getStringExtra(Constants.ARG_RECEIVER_KEY);
         sender_receiver_key=senderKey+"match"+receiverKey;
         receiver_sender_key=receiverKey+"match"+senderKey;
         senderFirebaseToken=sharedPreferences.getString(Constants.ARG_FIREBASE_TOKEN,null);

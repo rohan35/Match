@@ -53,7 +53,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                                   String receiver,
                                   String firebaseToken) {
         Intent intent = new Intent(this, ChatHandler.class);
-        intent.putExtra("receiver_key", receiver);
+        intent.putExtra(Constants.ARG_RECEIVER_KEY, receiver);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
