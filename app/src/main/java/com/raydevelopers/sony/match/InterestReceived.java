@@ -1,5 +1,6 @@
 package com.raydevelopers.sony.match;
 
+import android.app.ActionBar;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -8,6 +9,8 @@ import android.support.annotation.StringDef;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -19,6 +22,7 @@ import com.raydevelopers.sony.match.model.Interest;
 import com.raydevelopers.sony.match.model.User;
 import com.raydevelopers.sony.match.utils.Constants;
 import com.raydevelopers.sony.match.utils.ReceivedRecylerViewAdapter;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,11 +35,15 @@ public class InterestReceived extends AppCompatActivity {
     ArrayList<User> user_details=new ArrayList<>();
     private RecyclerView mRecyclerView;
     private ReceivedRecylerViewAdapter mAdapter;
+    private AVLoadingIndicatorView loadingIndicatorView;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.received_layout);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mRecyclerView=(RecyclerView)findViewById(R.id.received_rv);
+        loadingIndicatorView=(AVLoadingIndicatorView)findViewById(R.id.indicator);
+        startAnim();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(InterestReceived.this);
         final String key = sharedPreferences.getString(Constants.ARG_KEY, null);
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("interest");
@@ -74,11 +82,29 @@ public class InterestReceived extends AppCompatActivity {
                 mRecyclerView.setLayoutManager(linearLayoutManager);
                 mAdapter=new ReceivedRecylerViewAdapter(InterestReceived.this,user_details,key);
                 mRecyclerView.setAdapter(mAdapter);
+                stopAnim();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
+    }
+    void startAnim()
+    {
+        loadingIndicatorView.setVisibility(View.VISIBLE);
+    }
+    void stopAnim()
+    {
+        loadingIndicatorView.setVisibility(View.GONE);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id=item.getItemId();
+        if (id==android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

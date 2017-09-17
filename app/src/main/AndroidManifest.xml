@@ -14,6 +14,8 @@
         <activity android:name=".InterestReceived"/>
         <activity android:name=".AcceptedInterest"/>
         <activity android:name=".MessangerActivity"/>
+        <activity android:name=".UserDetails"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <service
             android:name=".fcm.MyFirebaseMessagingService">
             <intent-filter>

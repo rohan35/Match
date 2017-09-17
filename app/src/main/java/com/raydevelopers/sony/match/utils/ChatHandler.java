@@ -24,6 +24,7 @@ import com.raydevelopers.sony.match.R;
 import com.raydevelopers.sony.match.fcm.FcmNotificationBuilder;
 import com.raydevelopers.sony.match.model.Chat;
 import com.raydevelopers.sony.match.model.User;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 
@@ -41,6 +42,7 @@ public class ChatHandler extends AppCompatActivity {
     private EditText message;
     private String senderFirebaseToken;
     private String receiverFirebaseToken;
+    private AVLoadingIndicatorView loadingIndicatorView;
     private String timeStamp;
     private  ArrayList<Chat> meChatList=new ArrayList<>();
     private static ArrayList<Chat> otherChatList=new ArrayList<>();
@@ -49,8 +51,10 @@ public class ChatHandler extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_layout);
+        loadingIndicatorView=(AVLoadingIndicatorView)findViewById(R.id.indicator);
         message=(EditText)findViewById(R.id.message);
         mRecyclerView=(RecyclerView)findViewById(R.id.chat_view);
+        startAnim();
         Intent i=getIntent();
         //getIntent
         SharedPreferences sharedPreferences= PreferenceManager.getDefaultSharedPreferences(this);
@@ -70,7 +74,7 @@ public class ChatHandler extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mAdapter.notifyDataSetChanged();
-
+stopAnim();
 
         send=(Button)findViewById(R.id.send_message);
         send.setOnClickListener(new View.OnClickListener() {
@@ -264,5 +268,13 @@ public class ChatHandler extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         active = false;
+    }
+    void startAnim()
+    {
+        loadingIndicatorView.setVisibility(View.VISIBLE);
+    }
+    void stopAnim()
+    {
+        loadingIndicatorView.setVisibility(View.GONE);
     }
 }

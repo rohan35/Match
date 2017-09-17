@@ -1,5 +1,6 @@
 package com.raydevelopers.sony.match;
 
+import android.app.ActionBar;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -7,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,6 +21,7 @@ import com.raydevelopers.sony.match.model.Interest;
 import com.raydevelopers.sony.match.model.User;
 import com.raydevelopers.sony.match.utils.AcceptedRecyclerViewAdapter;
 import com.raydevelopers.sony.match.utils.Constants;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 
@@ -33,16 +36,20 @@ public class AcceptedInterest extends AppCompatActivity {
     ArrayList<String> users=new ArrayList<>();
     ArrayList<User> checkUsers=new ArrayList<>();
     ArrayList<User> finalList=new ArrayList<>();
+    private AVLoadingIndicatorView loadingIndicatorView;
     private  String key="";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.accepted_layout);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         key = sharedPreferences.getString(Constants.ARG_KEY, null);
         mRecyclerView=(RecyclerView)findViewById(R.id.accepted_rv);
+        loadingIndicatorView=(AVLoadingIndicatorView)findViewById(R.id.indicator);
         emptyView=(TextView)findViewById(R.id.not_accepted);
+        startAnim();
         DatabaseReference ref= FirebaseDatabase.getInstance().getReference("interest");
         ref.orderByChild("mConnected").equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -115,6 +122,7 @@ public class AcceptedInterest extends AppCompatActivity {
                                 LinearLayoutManager.VERTICAL, false);
                         mRecyclerView.setLayoutManager(linearLayoutManager);
                         adapter.notifyDataSetChanged();
+                stopAnim();
                     //}
             }
 
@@ -124,5 +132,23 @@ public class AcceptedInterest extends AppCompatActivity {
             }
         });
 
+    }
+void startAnim()
+{
+    loadingIndicatorView.setVisibility(View.VISIBLE);
+}
+void stopAnim()
+{
+    loadingIndicatorView.setVisibility(View.GONE);
+}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id=item.getItemId();
+        if (id==android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

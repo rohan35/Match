@@ -137,6 +137,14 @@ public void getUser(final AccessToken token)
                         JSONObject data=picture.getJSONObject("data");
                         System.out.println(data.getString("url"));
                         int age=ageObject.getInt("min");
+                        String gender=object.getString("gender");
+                        String genderInterest;
+                        if(gender.equals("male")){
+                            genderInterest="female";
+                        }
+                        else {
+                            genderInterest="male";
+                        }
                         User user1 =new User(object.getString("name"),object.getString("id"),
                                 age,object.getString("gender"),data.getString("url"));
                         SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(

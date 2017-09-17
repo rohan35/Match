@@ -13,6 +13,8 @@ public class User {
     public String mkey;
     public User mUser;
     public String mFirebaseToken;
+    public String mInterest;
+    public String mSummary;
     public User() {
         //Default construcutor;
     }
